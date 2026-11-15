@@ -69,3 +69,28 @@ footer{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
 
 /* Foto do atleta */
 .profile-photo-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}.profile-avatar{width:116px;height:116px;flex:0 0 116px;display:grid;place-items:center;overflow:hidden;border-radius:50%;border:4px solid #a8e64b;background:#123c35;font-size:48px}.profile-avatar img{width:100%;height:100%;object-fit:cover}.profile-photo-row>div:last-child{flex:1;min-width:210px}.photo-upload{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin:6px 8px 6px 0}.profile-photo-panel .btn{margin-top:6px}@media(max-width:480px){.profile-photo-row{align-items:flex-start}.profile-avatar{width:94px;height:94px;flex-basis:94px}}
+
+/* Painel de treino: leitura rápida e responsiva */
+.treino-panel{overflow:hidden}
+.treino-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.treino-section-head h3{margin:4px 0}
+.treino-eyebrow{font-size:.7rem;letter-spacing:.12em;font-weight:800;opacity:.7}
+.treino-live{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:#e9edf2;color:#34495e;font-size:.8rem;font-weight:700;white-space:nowrap}
+.treino-live.is-active{background:#d7f8e7;color:#09693d}
+.treino-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:18px 0}
+.treino-metric{min-width:0;padding:18px!important;border-radius:16px!important;display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+.treino-metric strong{font-size:.8rem;opacity:.78}
+.treino-metric .stat{font-size:clamp(1.25rem,3vw,2rem);font-weight:800;overflow-wrap:anywhere;line-height:1.2}
+.treino-metric-primary{background:linear-gradient(140deg,#0c5269,#0e8290)!important;color:#fff!important}
+.treino-metric-points{background:linear-gradient(140deg,#0b6c53,#159477)!important;color:#fff!important}
+.treino-gps-status{display:inline-block;border-radius:10px;background:rgba(38,135,111,.09);padding:10px 13px;font-size:.9rem}
+.treino-help{border:1px solid rgba(127,147,163,.25);border-radius:12px;padding:12px 15px;margin:14px 0}
+.treino-help summary{cursor:pointer;font-weight:700}
+.treino-help p{margin:12px 0 0}
+.treino-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.treino-actions .btn{min-height:46px}
+.treino-ranking-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.treino-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.treino-tablewrap table{min-width:680px}
+.treino-tablewrap td:last-child{font-weight:800}
+@media(max-width:600px){.treino-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.treino-metric{padding:14px!important}.treino-metric .stat{font-size:clamp(1.12rem,5vw,1.55rem)}.treino-metric-points{grid-column:1/-1}.treino-actions .btn{width:100%}.treino-section-head{align-items:flex-start}}
