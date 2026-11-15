@@ -94,3 +94,20 @@ footer{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
 .treino-tablewrap table{min-width:680px}
 .treino-tablewrap td:last-child{font-weight:800}
 @media(max-width:600px){.treino-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.treino-metric{padding:14px!important}.treino-metric .stat{font-size:clamp(1.12rem,5vw,1.55rem)}.treino-metric-points{grid-column:1/-1}.treino-actions .btn{width:100%}.treino-section-head{align-items:flex-start}}
+
+/* Calendário estadual de corridas 2026–2027 */
+.cal-panel{margin-bottom:18px}
+.cal-tabs{display:flex;gap:8px;margin:14px 0}
+.cal-tabs .btn{min-width:92px}
+.cal-panel label{display:block;font-weight:700;font-size:.86rem;margin:14px 0 7px}
+.cal-panel input{width:100%;max-width:560px;padding:12px 14px;border-radius:10px;border:1px solid #bdcbd2;background:#fff;color:#172d37}
+.cal-list{display:grid;gap:10px;margin:16px 0}
+.cal-event{display:flex;align-items:center;gap:14px;padding:13px;border:1px solid rgba(120,148,160,.2);border-radius:14px;background:rgba(127,154,165,.055)}
+.cal-date{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:58px;padding:9px;border-radius:10px;background:#0c5269;color:white;line-height:1.1}
+.cal-date strong{font-size:1.45rem}
+.cal-date span{font-size:.75rem;text-transform:uppercase}
+.cal-info{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
+.cal-info strong{font-size:.94rem;overflow-wrap:anywhere}
+.cal-info span{font-size:.81rem;opacity:.8}
+.cal-tag{font-size:.73rem;border-radius:999px;padding:5px 9px;background:rgba(27,126,112,.12);color:inherit;white-space:nowrap}
+@media(max-width:600px){.cal-event{gap:9px;padding:10px}.cal-tag{display:none}.cal-date{min-width:49px}.cal-info strong{font-size:.88rem}}
