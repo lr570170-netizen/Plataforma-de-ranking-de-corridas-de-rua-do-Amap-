@@ -56,10 +56,10 @@ class MainActivity : Activity() {
         val active = prefs.getBoolean("ativo", false)
         val meters = prefs.getFloat(if(active) "atual_metros" else "ultimo_metros", 0f)
         val seconds = prefs.getLong(if(active) "atual_segundos" else "ultimo_segundos", 0L)
-        status.text = String.format(Locale.getDefault(), "%s\nDistância: %.2f km\nTempo: %d:%02d\\nRitmo: %s",
+        status.text = String.format(Locale.getDefault(), "%s\nDistância: %.2f km\nTempo: %d:%02d\nRitmo: %s",
             if(active) "Treino iniciado • acompanhe pela notificação" else "Pronto para treinar",
             meters / 1000, seconds / 60, seconds % 60,
-            if (meters >= 100f) {
+            if (meters >= 10f) {
                 val pace = (seconds / (meters / 1000.0)).toInt()
                 String.format(Locale.getDefault(), "%d:%02d min/km", pace / 60, pace % 60)
             } else "--")
@@ -67,14 +67,14 @@ class MainActivity : Activity() {
         val sb = StringBuilder("\nHistórico salvo no aparelho\n")
         for(i in entries.length()-1 downTo maxOf(0, entries.length()-10)) {
             val e = entries.optJSONObject(i) ?: continue
-            sb.append(String.format(Locale.getDefault(), "• %.2f km em %d:%02d\n",
-                e.optDouble("distancia_m")/1000, e.optLong("duracao_s")/60, e.optLong("duracao_s")%60))
+            sb.append(String.format(Locale.getDefault(), "• %.2f km em %d:%02d — %.2f pontos\n",
+                e.optDouble("distancia_m")/1000, e.optLong("duracao_s")/60, e.optLong("duracao_s")%60, pontos(e.optDouble("distancia_m"),e.optLong("duracao_s"))))
         }
         if(entries.length()==0) sb.append("Nenhum treino concluído.")
-        sb.append("\n\nOs treinos ainda não são enviados ao ranking online.")
+        var total = 0.0\n        for (i in 0 until entries.length()) {\n            val e = entries.optJSONObject(i) ?: continue\n            if (e.optDouble("distancia_m") >= 10.0 && e.optLong("duracao_s") >= 30 && e.optInt("amostras") >= 3) total += pontos(e.optDouble("distancia_m"), e.optLong("duracao_s"))\n        }\n        sb.append(String.format(Locale.getDefault(), "\nTotal acumulado: %.2f pontos", total))\n        sb.append("\n\nOs treinos ainda não são enviados ao ranking online.")
         history.text = sb.toString()
     }
-    private fun startTraining() {
+    private fun pontos(metros: Double, segundos: Long): Double = if (segundos > 0) 10.0 * (metros / 1000.0) + 5.0 * (metros / 1000.0 * 3600.0 / segundos) else 0.0\n    private fun startTraining() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 10)
             return
