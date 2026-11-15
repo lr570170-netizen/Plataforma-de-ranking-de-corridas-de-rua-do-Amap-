@@ -1,7 +1,7 @@
 import {getStore} from '@netlify/blobs';import {getDatabase} from '@netlify/database';
 import {getUser} from '@netlify/identity';
 const reply=(v,s=200)=>Response.json(v,{status:s,headers:{'Cache-Control':'no-store'}});
-const ds=['5 km','6 km'];
+const ds=['5 km'];
 export default async function(req){
  try{
   const db=getDatabase();
