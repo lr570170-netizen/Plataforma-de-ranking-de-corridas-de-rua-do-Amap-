@@ -25,7 +25,7 @@ class MainActivity : Activity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(36, 60, 36, 36) }
+        val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(30), dp(20), dp(20)) }
         val heading = TextView(this).apply { text = "Ranking Amapá Running\nTreino GPS em segundo plano"; textSize = 23f }
         status = TextView(this)
         history = TextView(this)
@@ -80,7 +80,9 @@ class MainActivity : Activity() {
         sb.append("\n\nOs treinos ainda não são enviados ao ranking online.")
         history.text = sb.toString()
     }
-    private fun pontos(metros: Double, segundos: Long): Double = if (segundos > 0) 10.0 * (metros / 1000.0) + 5.0 * (metros / 1000.0 * 3600.0 / segundos) else 0.0\n    private fun startTraining() {
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density + 0.5f).toInt()
+    private fun pontos(metros: Double, segundos: Long): Double = if (segundos > 0) 10.0 * (metros / 1000.0) + 5.0 * (metros / 1000.0 * 3600.0 / segundos) else 0.0
+    private fun startTraining() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 10)
             return
