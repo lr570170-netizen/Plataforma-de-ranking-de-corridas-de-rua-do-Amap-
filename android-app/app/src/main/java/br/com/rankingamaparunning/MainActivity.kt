@@ -71,7 +71,13 @@ class MainActivity : Activity() {
                 e.optDouble("distancia_m")/1000, e.optLong("duracao_s")/60, e.optLong("duracao_s")%60, pontos(e.optDouble("distancia_m"),e.optLong("duracao_s"))))
         }
         if(entries.length()==0) sb.append("Nenhum treino concluído.")
-        var total = 0.0\n        for (i in 0 until entries.length()) {\n            val e = entries.optJSONObject(i) ?: continue\n            if (e.optDouble("distancia_m") >= 10.0 && e.optLong("duracao_s") >= 30 && e.optInt("amostras") >= 3) total += pontos(e.optDouble("distancia_m"), e.optLong("duracao_s"))\n        }\n        sb.append(String.format(Locale.getDefault(), "\nTotal acumulado: %.2f pontos", total))\n        sb.append("\n\nOs treinos ainda não são enviados ao ranking online.")
+        var total = 0.0
+        for (i in 0 until entries.length()) {
+            val e = entries.optJSONObject(i) ?: continue
+            if (e.optDouble("distancia_m") >= 10.0 && e.optLong("duracao_s") >= 30 && e.optInt("amostras") >= 3) total += pontos(e.optDouble("distancia_m"), e.optLong("duracao_s"))
+        }
+        sb.append(String.format(Locale.getDefault(), "\nTotal acumulado: %.2f pontos", total))
+        sb.append("\n\nOs treinos ainda não são enviados ao ranking online.")
         history.text = sb.toString()
     }
     private fun pontos(metros: Double, segundos: Long): Double = if (segundos > 0) 10.0 * (metros / 1000.0) + 5.0 * (metros / 1000.0 * 3600.0 / segundos) else 0.0\n    private fun startTraining() {
