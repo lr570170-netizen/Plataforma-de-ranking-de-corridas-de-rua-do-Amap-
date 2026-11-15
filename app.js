@@ -74,6 +74,10 @@ function baixarMedalhaBeta(id){
  <defs><radialGradient id="verde"><stop stop-color="#116b49"/><stop offset=".7" stop-color="#07462f"/><stop offset="1" stop-color="#03291e"/></radialGradient><linearGradient id="ouro" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff6bc"/><stop offset=".24" stop-color="#c18b20"/><stop offset=".48" stop-color="#ffe486"/><stop offset=".77" stop-color="#a66c12"/><stop offset="1" stop-color="#fbe59a"/></linearGradient><clipPath id="fotoMedalha"><circle cx="245" cy="650" r="75"/></clipPath></defs>
  <rect width="1200" height="1200" fill="#061a13"/><circle cx="600" cy="600" r="578" fill="url(#ouro)"/><circle cx="600" cy="600" r="548" fill="url(#verde)" stroke="#fff0a4" stroke-width="8"/><circle cx="600" cy="600" r="528" fill="none" stroke="#2ef46d" stroke-width="6"/><circle cx="600" cy="600" r="510" fill="none" stroke="#b99539" stroke-width="3"/>
  <path d="M225 389L340 333L405 350L505 280L576 315L673 260L742 305L840 274L970 370" stroke="#24de68" stroke-width="8" fill="none" stroke-linejoin="round" opacity=".85"/>
+ <g fill="#e7bf51" stroke="#ffedaa" stroke-width="1" opacity=".95">
+ ${Array.from({length:8},(_,i)=>{const y=445+i*64;const x=120+i*9;return `<ellipse cx="${x+25}" cy="${y}" rx="17" ry="39" transform="rotate(-30 ${x+25} ${y})"/><ellipse cx="${1080-i*9-25}" cy="${y}" rx="17" ry="39" transform="rotate(30 ${1080-i*9-25} ${y})"/>`}).join('')}
+ </g>
+ <g opacity=".85"><path d="M435 540H765M515 540L540 507H660L685 540M560 507L575 485H625L640 507" fill="none" stroke="#d9ba60" stroke-width="5"/><path d="M593 485V457H607V485" fill="#f4d275"/><circle cx="600" cy="454" r="8" fill="#f7e39a"/></g>
  ${texto(600,154,'R A N K I N G',38,'#f4d477')}${texto(600,257,'AMAPÁ',112)}${texto(600,316,'R U N N I N G',48,'#f5d57c')}${texto(600,401,'2026',78,'#ffe58b')}${texto(600,448,'MEDALHA DIGITAL',39)}${texto(600,485,'EDIÇÃO EXPERIMENTAL',25,'#f8d980')}
  <path d="M420 534H780" stroke="#e2b64c" stroke-width="4"/><circle cx="600" cy="534" r="9" fill="#ffe08b"/>
  <rect x="128" y="560" width="944" height="194" rx="49" fill="url(#ouro)" stroke="#fff4c4" stroke-width="5"/>
@@ -81,7 +85,7 @@ function baixarMedalhaBeta(id){
  ${nomeLinhas.map((l,i)=>texto(360,632+i*42,l,nomeLinhas.length>1?33:39,'#103b2b',800,'start')).join('')}
  ${texto(360,722,'PARTICIPANTE • RESULTADO HOMOLOGADO',22,'#21523b',700,'start')}
  <rect x="165" y="774" width="870" height="303" rx="35" fill="#063524" stroke="#e8c35f" stroke-width="7"/>
- ${texto(600,816,'NOME DA CORRIDA',22,'#d6b85e')}
+ ${texto(600,816,'PROVA CADASTRADA',22,'#d6b85e')}
  ${provaLinhas.map((l,i)=>texto(600,856+i*34,l,provaLinhas.length>1?29:35,'#ffffff',800)).join('')}
  <path d="M208 924H992" stroke="#9b823d" stroke-width="2"/>
  ${texto(340,955,'DISTÂNCIA',22,'#e8c76e')}${texto(600,955,'TEMPO OFICIAL',22,'#e8c76e')}${texto(857,955,'COLOCAÇÃO',22,'#e8c76e')}
@@ -89,7 +93,7 @@ function baixarMedalhaBeta(id){
  <path d="M464 940V1020M733 940V1020" stroke="#927c39" stroke-width="2"/>
  ${texto(600,1047,'LOCALIDADE',19,'#e8c76e')}
  ${localLinhas.map((l,i)=>texto(600,1075+i*24,l,localLinhas.length>1?20:23,'#ffffff',600)).join('')}
- ${texto(600,1140,'RANKING AMAPÁ RUNNING • 2026',22,'#f5d982')}
+ ${texto(600,1140,'AMAPÁ • MEIO DO MUNDO • 2026',22,'#f5d982')}
  </svg>`;
  const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='medalha-amapa-running-2026-'+id+'.svg';link.click();setTimeout(()=>URL.revokeObjectURL(url),1500)
 }
