@@ -7,9 +7,10 @@
     "@netlify/identity": "latest"
   },
   "devDependencies": {
-    "esbuild": "latest"
+    "esbuild": "latest",
+    "sharp": "^0.34.0"
   },
   "scripts": {
-    "build": "esbuild auth-entry.js --bundle --format=iife --platform=browser --outfile=auth-bundle.js"
+    "build": "node scripts/generate-icons.mjs && esbuild auth-entry.js --bundle --format=iife --platform=browser --outfile=auth-bundle.js"
   }
 }
