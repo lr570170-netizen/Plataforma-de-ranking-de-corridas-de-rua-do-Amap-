@@ -111,3 +111,22 @@ footer{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
 .cal-info span{font-size:.81rem;opacity:.8}
 .cal-tag{font-size:.73rem;border-radius:999px;padding:5px 9px;background:rgba(27,126,112,.12);color:inherit;white-space:nowrap}
 @media(max-width:600px){.cal-event{gap:9px;padding:10px}.cal-tag{display:none}.cal-date{min-width:49px}.cal-info strong{font-size:.88rem}}
+
+/* Perfil completo do corredor */
+.perfil-dashboard h4{margin:22px 0 12px}
+.perfil-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0}
+.perfil-stats .card{padding:17px;display:flex;flex-direction:column;gap:9px;min-width:0;border-radius:14px}
+.perfil-stats small{font-size:.78rem;opacity:.72}
+.perfil-stats strong{font-size:clamp(1.2rem,2.5vw,1.75rem);overflow-wrap:anywhere}
+.perfil-chart{display:flex;align-items:flex-end;gap:12px;min-height:180px;overflow-x:auto;padding:15px 5px 5px}
+.perfil-bar{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:60px;height:170px;font-size:.76rem}
+.perfil-bar>span{white-space:nowrap;font-weight:700}
+.perfil-bar-track{height:125px;width:35px;display:flex;align-items:flex-end;border-radius:9px;background:rgba(111,144,151,.13);overflow:hidden}
+.perfil-bar-track>div{width:100%;background:linear-gradient(180deg,#19a88a,#0a6376);border-radius:9px 9px 0 0}
+.perfil-medals{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+.perfil-medals .card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:16px;border-radius:14px}
+.perfil-medal-icon{font-size:2.4rem}
+.perfil-medals small{font-size:.76rem;opacity:.75}
+.perfil-medals .card>span{font-size:.75rem;font-weight:700}
+.perfil-medal-locked{opacity:.52;filter:grayscale(1)}
+@media(max-width:600px){.perfil-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.perfil-stats .card{padding:13px}.perfil-medals{grid-template-columns:repeat(2,minmax(0,1fr))}}
