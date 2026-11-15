@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS atletas (id BIGSERIAL PRIMARY KEY, nome TEXT NOT NULL, cidade TEXT NOT NULL, sexo TEXT NOT NULL, faixa TEXT NOT NULL, classe TEXT NOT NULL DEFAULT '', criado_em TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS resultados (id BIGSERIAL PRIMARY KEY, atleta_id BIGINT NOT NULL REFERENCES atletas(id), prova TEXT NOT NULL, data DATE NOT NULL, dist TEXT NOT NULL, tempo_segundos INTEGER NOT NULL CHECK (tempo_segundos>0), colocacao INTEGER NOT NULL CHECK(colocacao>0), url TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pendente' CHECK(status IN ('pendente','aprovado','rejeitado')), criado_em TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS idx_resultados_ranking ON resultados (status,dist,data,atleta_id);
