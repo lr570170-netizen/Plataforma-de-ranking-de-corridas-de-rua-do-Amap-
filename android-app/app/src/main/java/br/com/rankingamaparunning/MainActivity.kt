@@ -56,7 +56,7 @@ class MainActivity : Activity() {
         val active = prefs.getBoolean("ativo", false)
         val meters = prefs.getFloat(if(active) "atual_metros" else "ultimo_metros", 0f)
         val seconds = prefs.getLong(if(active) "atual_segundos" else "ultimo_segundos", 0L)
-        status.text = String.format(Locale.getDefault(), "%s\nDistância: %.2f km\nTempo: %d:%02d",
+        status.text = String.format(Locale.getDefault(), "%s\nDistância: %.2f km\nTempo: %d:%02d\\nRitmo: %s",
             if(active) "Treino iniciado • acompanhe pela notificação" else "Pronto para treinar",
             meters / 1000, seconds / 60, seconds % 60,
             if (meters >= 100f) {
