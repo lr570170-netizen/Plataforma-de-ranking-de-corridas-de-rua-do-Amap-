@@ -8,6 +8,12 @@ export default async function(req){
   if(req.method==='GET'){
    const u=await getUser();
    const url=new URL(req.url);
+   if(url.searchParams.get('homologados')==='1'){
+    if(!u?.roles?.includes('admin'))return reply({erro:'Sem permissão'},403);
+    const busca=String(url.searchParams.get('busca')||'').trim().slice(0,90);
+    const resultados=await db.sql`SELECT r.id,r.prova,r.data,r.dist,r.tempo_segundos,r.colocacao,r.localidade,r.url,r.comprovante_pdf,a.nome FROM resultados_beta_2026 r JOIN atletas a ON a.id=r.atleta_id WHERE r.status='aprovado' AND (${busca}='' OR a.nome ILIKE '%' || ${busca} || '%' OR r.prova ILIKE '%' || ${busca} || '%') ORDER BY r.data DESC,r.id DESC LIMIT 100`;
+    return reply({resultados});
+   }
    if(url.searchParams.get('fila')==='1'){
     if(!u?.roles?.includes('admin'))return reply({erro:'Sem permissão'},403);
     const resultados=await db.sql`SELECT r.id,r.prova,r.data,r.dist,r.tempo_segundos,r.url,r.comprovante_pdf,r.colocacao,r.localidade,a.nome FROM resultados_beta_2026 r JOIN atletas a ON a.id=r.atleta_id WHERE r.status='pendente' ORDER BY r.criado_em LIMIT 100`;
@@ -32,8 +38,9 @@ export default async function(req){
   if(req.method==='PATCH'){
    if(!u.roles?.includes('admin'))return reply({erro:'Sem permissão'},403);
    const b=await req.json(),id=Number(b.id);
-   if(!Number.isSafeInteger(id)||id<1||!['aprovado','rejeitado'].includes(b.status))return reply({erro:'Dados inválidos'},400);
-   const rows=await db.sql`UPDATE resultados_beta_2026 SET status=${b.status} WHERE id=${id} AND status='pendente' RETURNING id,status`;
+   if(!Number.isSafeInteger(id)||id<1||!['aprovado','rejeitado','revogado'].includes(b.status))return reply({erro:'Dados inválidos'},400);
+   const origem=b.status==='revogado'?'aprovado':'pendente',destino=b.status==='revogado'?'rejeitado':b.status;
+   const rows=await db.sql`UPDATE resultados_beta_2026 SET status=${destino} WHERE id=${id} AND status=${origem} RETURNING id,status`;
    return rows.length?reply({resultado:rows[0]}):reply({erro:'Resultado já analisado ou inexistente'},409);
   }
   return reply({erro:'Método não permitido'},405);
