@@ -5,13 +5,13 @@ export default async function(req){
  if(req.method!=='GET')return json({erro:'Método não permitido'},405);
  try{
   const db=getDatabase();
-  const rows=await db.sql`SELECT a.id,a.nome,a.cidade,a.sexo,a.faixa,a.classe,r.id AS resultado_id,r.prova,r.data,r.dist,r.tempo_segundos,r.colocacao FROM resultados r JOIN atletas a ON a.id=r.atleta_id WHERE r.status='aprovado' AND r.data BETWEEN '2027-01-01' AND '2027-12-31' ORDER BY r.data,r.id`;
+  await db.sql`ALTER TABLE atletas ADD COLUMN IF NOT EXISTS nivel VARCHAR(12) NOT NULL DEFAULT 'Amador'`;const rows=await db.sql`SELECT a.id,a.nome,a.cidade,a.sexo,a.faixa,a.classe,a.nivel,r.id AS resultado_id,r.prova,r.data,r.dist,r.tempo_segundos,r.colocacao FROM resultados r JOIN atletas a ON a.id=r.atleta_id WHERE r.status='aprovado' AND r.data BETWEEN '2027-01-01' AND '2027-12-31' ORDER BY r.data,r.id`;
   const grupos=new Map(),referencias=new Map();
   for(const r of rows){
-   const chave=[r.dist,r.sexo,r.classe||''].join('|'),atleta=String(r.id),prova=[r.prova,String(r.data).slice(0,10)].join('|');
+   const chave=[r.dist,r.sexo,r.classe||'',r.nivel||'Amador'].join('|'),atleta=String(r.id),prova=[r.prova,String(r.data).slice(0,10)].join('|');
    if(!grupos.has(chave))grupos.set(chave,new Map());
    const participantes=grupos.get(chave);
-   if(!participantes.has(atleta))participantes.set(atleta,{id:r.id,nome:r.nome,cidade:r.cidade,sexo:r.sexo,faixa:r.faixa,classe:r.classe,dist:r.dist,resultados:new Map()});
+   if(!participantes.has(atleta))participantes.set(atleta,{id:r.id,nome:r.nome,cidade:r.cidade,sexo:r.sexo,faixa:r.faixa,classe:r.classe,nivel:r.nivel||'Amador',dist:r.dist,resultados:new Map()});
    const perfil=participantes.get(atleta),anterior=perfil.resultados.get(prova);
    if(!anterior||Number(r.colocacao)<Number(anterior.colocacao)||(Number(r.colocacao)===Number(anterior.colocacao)&&Number(r.tempo_segundos)<Number(anterior.tempo_segundos)))perfil.resultados.set(prova,r);
   }
@@ -25,10 +25,10 @@ export default async function(req){
     const pontosTotal=validos.reduce((s,x)=>s+pontos(Number(x.colocacao)),0);
     const tempos=validos.map(x=>Number(x.tempo_segundos));
     const vitorias=validos.filter(x=>Number(x.colocacao)===1).length,segundos=validos.filter(x=>Number(x.colocacao)===2).length,terceiros=validos.filter(x=>Number(x.colocacao)===3).length;
-    atletas.push({id:a.id,nome:a.nome,cidade:a.cidade,sexo:a.sexo,faixa:a.faixa,classe:a.classe,dist:a.dist,provas:validos.length,referencia,pontos:pontosTotal,melhor_tempo:Math.min(...tempos),soma:tempos.reduce((x,y)=>x+y,0),vitorias,segundos,terceiros,provisorio:validos.length<referencia,faltam:Math.max(0,referencia-validos.length)});
+    atletas.push({id:a.id,nome:a.nome,cidade:a.cidade,sexo:a.sexo,faixa:a.faixa,classe:a.classe,nivel:a.nivel,dist:a.dist,provas:validos.length,referencia,pontos:pontosTotal,melhor_tempo:Math.min(...tempos),soma:tempos.reduce((x,y)=>x+y,0),vitorias,segundos,terceiros,provisorio:validos.length<referencia,faltam:Math.max(0,referencia-validos.length)});
    }
   }
-  atletas.sort((a,b)=>a.dist.localeCompare(b.dist)||a.sexo.localeCompare(b.sexo)||String(a.classe).localeCompare(String(b.classe))||Number(a.provisorio)-Number(b.provisorio)||b.pontos-a.pontos||b.vitorias-a.vitorias||b.segundos-a.segundos||b.terceiros-a.terceiros||a.melhor_tempo-b.melhor_tempo||a.nome.localeCompare(b.nome,'pt-BR'));
+  atletas.sort((a,b)=>a.dist.localeCompare(b.dist)||a.nivel.localeCompare(b.nivel)||a.sexo.localeCompare(b.sexo)||String(a.classe).localeCompare(String(b.classe))||Number(a.provisorio)-Number(b.provisorio)||b.pontos-a.pontos||b.vitorias-a.vitorias||b.segundos-a.segundos||b.terceiros-a.terceiros||a.melhor_tempo-b.melhor_tempo||a.nome.localeCompare(b.nome,'pt-BR'));
   return json({temporada:2027,criterio:'colocacao',limite:null,dinamico:true,referencias:Object.fromEntries(referencias),atletas:atletas.slice(0,500)});
  }catch(e){console.error('ranking 2027:',e);return json({erro:'Ranking indisponível. Verifique a configuração do banco de dados.'},503)}
 }
