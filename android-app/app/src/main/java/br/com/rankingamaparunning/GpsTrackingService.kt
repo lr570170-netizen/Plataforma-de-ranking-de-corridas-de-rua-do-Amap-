@@ -27,6 +27,7 @@ class GpsTrackingService : Service() {
     private var startedWall = 0L
     private var samples = 0
     private val route = JSONArray()
+    private var lastSavedAt = 0L
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
@@ -41,6 +42,7 @@ class GpsTrackingService : Service() {
             START -> if (callback == null) {
                 startedAt = SystemClock.elapsedRealtime()
                 startedWall = System.currentTimeMillis()
+                meters = 0.0; samples = 0; previous = null
                 getSharedPreferences(STORE, MODE_PRIVATE).edit().putBoolean("ativo", true).apply()
                 startForeground(NOTIFICATION_ID, notification("Aguardando sinal GPS"))
                 beginTracking()
@@ -91,6 +93,13 @@ class GpsTrackingService : Service() {
         samples++
         route.put(JSONObject().put("lat", loc.latitude).put("lon", loc.longitude)
             .put("time", loc.time).put("accuracy", loc.accuracy))
+        if (SystemClock.elapsedRealtime() - lastSavedAt > 5000L) {
+            getSharedPreferences(STORE, MODE_PRIVATE).edit()
+                .putString("rascunho_percurso", route.toString())
+                .putLong("rascunho_inicio", startedWall)
+                .putFloat("rascunho_metros", meters.toFloat()).apply()
+            lastSavedAt = SystemClock.elapsedRealtime()
+        }
         val elapsed = (SystemClock.elapsedRealtime() - startedAt) / 1000
         val pace = if (meters >= 100) (elapsed / (meters / 1000.0)).toInt() else 0
         val summary = String.format(Locale.US, "%.2f km • %d:%02d • %d:%02d/km",
@@ -114,7 +123,7 @@ class GpsTrackingService : Service() {
         history.put(record)
         prefs.edit().putBoolean("ativo", false).putString("historico", history.toString())
             .putFloat("ultimo_metros", meters.toFloat()).putLong("ultimo_segundos", elapsed)
-            .putInt("amostras", samples).apply()
+            .putInt("amostras", samples).remove("rascunho_percurso").remove("rascunho_inicio").remove("rascunho_metros").apply()
         (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICATION_ID + 1,
             Notification.Builder(this, CHANNEL).setSmallIcon(android.R.drawable.ic_menu_mylocation)
                 .setContentTitle("Treino salvo no celular")
