@@ -33,6 +33,16 @@ export default async function(req){
    const b=await req.json(),d=String(b.data||''),t=String(b.tempo||''),m=t.match(/^(\d{1,2}):([0-5]\d):([0-5]\d)$/),segundos=m?Number(m[1])*3600+Number(m[2])*60+Number(m[3]):0,colocacao=Number(b.colocacao);
    if(!/^2026-\d{2}-\d{2}$/.test(d)||!Number.isFinite(Date.parse(d))||d>new Date().toISOString().slice(0,10)||!ds.includes(b.dist)||segundos<1||segundos>86400||!Number.isSafeInteger(colocacao)||colocacao<1||String(b.prova||'').trim().length<3||String(b.prova||'').length>120||String(b.localidade||'').trim().length>120||(!/^https:\/\//.test(String(b.url||''))&&!/^[a-f0-9-]{36}$/.test(String(b.comprovante_pdf||'')))||String(b.url||'').length>1000)return reply({erro:'Informe resultado oficial válido de 2026 e link HTTPS de comprovação'},400);
    if(b.comprovante_pdf){const meta=await getStore({name:'comprovantes-resultados',consistency:'strong'}).getMetadata(String(b.comprovante_pdf));if(!meta||meta.metadata?.owner!==u.id)return reply({erro:'O PDF deve ser enviado pela sua própria conta'},403)}
+   if(b.editar_id!==undefined){
+    const editarId=Number(b.editar_id);
+    if(!Number.isSafeInteger(editarId)||editarId<1)return reply({erro:'Resultado para edição inválido.'},400);
+    const anterior=await db.sql`SELECT r.id,r.url,r.comprovante_pdf FROM resultados_beta_2026 r JOIN atletas a ON a.id=r.atleta_id WHERE r.id=${editarId} AND a.identity_id=${u.id} AND r.status='rejeitado' LIMIT 1`;
+    if(!anterior.length)return reply({erro:'Somente resultados rejeitados da sua conta podem ser editados.'},403);
+    const url=String(b.url||'').trim(),pdf=b.comprovante_pdf||anterior[0].comprovante_pdf||null;
+    if(!url&&!pdf)return reply({erro:'Informe um link oficial ou mantenha/anexe um PDF de comprovação.'},400);
+    const atualizados=await db.sql`UPDATE resultados_beta_2026 SET prova=${b.prova.trim()},data=${d}::date,dist=${b.dist},tempo_segundos=${segundos},colocacao=${colocacao},localidade=${String(b.localidade||'').trim()||null},url=${url},comprovante_pdf=${pdf},status='pendente',criado_em=now() WHERE id=${editarId} AND status='rejeitado' RETURNING id`;
+    return atualizados.length?reply({id:atualizados[0].id,status:'pendente',reenviado:true}):reply({erro:'Não foi possível reenviar o resultado.'},409);
+   }
    const perfil=await db.sql`SELECT id FROM atletas WHERE identity_id=${u.id} LIMIT 1`;
    if(!perfil.length)return reply({erro:'Seu perfil online ainda não foi salvo. Acesse Perfil, preencha seus dados e salve antes de enviar o resultado.'},409);
    const atletaId=perfil[0].id,prova=b.prova.trim(),localidade=String(b.localidade||'').trim()||null;
