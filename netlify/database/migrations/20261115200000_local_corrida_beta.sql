@@ -1,0 +1,1 @@
+ALTER TABLE resultados_beta_2026 ADD COLUMN IF NOT EXISTS localidade TEXT;
