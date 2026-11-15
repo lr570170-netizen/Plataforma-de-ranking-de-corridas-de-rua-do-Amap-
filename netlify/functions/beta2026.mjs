@@ -15,7 +15,7 @@ export default async function(req){
    }
    if(url.searchParams.get('meus')==='1'){
     if(!u)return reply({erro:'Entre na sua conta'},401);
-    const resultados=await db.sql`SELECT r.id,r.prova,r.data,r.dist,r.tempo_segundos,r.status,r.comprovante_pdf FROM resultados_beta_2026 r JOIN atletas a ON a.id=r.atleta_id WHERE a.identity_id=${u.id} ORDER BY r.data DESC LIMIT 200`;
+    const resultados=await db.sql`SELECT r.id,r.prova,r.data,r.dist,r.tempo_segundos,r.status,r.comprovante_pdf,r.colocacao FROM resultados_beta_2026 r JOIN atletas a ON a.id=r.atleta_id WHERE a.identity_id=${u.id} ORDER BY r.data DESC LIMIT 200`;
     return reply({resultados});
    }
    const atletas=await db.sql`SELECT a.nome,a.cidade,a.sexo,a.faixa,a.classe,r.dist,COUNT(*)::int AS provas,MIN(r.tempo_segundos)::int AS melhor_tempo FROM resultados_beta_2026 r JOIN atletas a ON a.id=r.atleta_id WHERE r.status='aprovado' GROUP BY a.id,a.nome,a.cidade,a.sexo,a.faixa,a.classe,r.dist ORDER BY r.dist,melhor_tempo,a.nome LIMIT 500`;
