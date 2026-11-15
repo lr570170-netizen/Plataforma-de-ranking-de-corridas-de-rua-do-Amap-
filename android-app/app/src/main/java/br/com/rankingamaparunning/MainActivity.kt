@@ -16,6 +16,13 @@ import java.util.Locale
 class MainActivity : Activity() {
     private lateinit var status: TextView
     private lateinit var history: TextView
+    private val refreshHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val refreshTicker = object : Runnable {
+        override fun run() {
+            if (::status.isInitialized) refresh()
+            refreshHandler.postDelayed(this, 3000L)
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(36, 60, 36, 36) }
@@ -35,7 +42,15 @@ class MainActivity : Activity() {
         setContentView(ScrollView(this).apply { addView(layout) })
         refresh()
     }
-    override fun onResume() { super.onResume(); if (::status.isInitialized) refresh() }
+    override fun onResume() {
+        super.onResume()
+        refreshHandler.removeCallbacks(refreshTicker)
+        refreshTicker.run()
+    }
+    override fun onPause() {
+        refreshHandler.removeCallbacks(refreshTicker)
+        super.onPause()
+    }
     private fun refresh() {
         val prefs = getSharedPreferences(GpsTrackingService.STORE, MODE_PRIVATE)
         val active = prefs.getBoolean("ativo", false)
@@ -43,7 +58,11 @@ class MainActivity : Activity() {
         val seconds = prefs.getLong(if(active) "atual_segundos" else "ultimo_segundos", 0L)
         status.text = String.format(Locale.getDefault(), "%s\nDistância: %.2f km\nTempo: %d:%02d",
             if(active) "Treino iniciado • acompanhe pela notificação" else "Pronto para treinar",
-            meters / 1000, seconds / 60, seconds % 60)
+            meters / 1000, seconds / 60, seconds % 60,
+            if (meters >= 100f) {
+                val pace = (seconds / (meters / 1000.0)).toInt()
+                String.format(Locale.getDefault(), "%d:%02d min/km", pace / 60, pace % 60)
+            } else "--")
         val entries = try { JSONArray(prefs.getString("historico", "[]")) } catch (_: Exception) { JSONArray() }
         val sb = StringBuilder("\nHistórico salvo no aparelho\n")
         for(i in entries.length()-1 downTo maxOf(0, entries.length()-10)) {
