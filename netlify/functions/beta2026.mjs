@@ -32,8 +32,18 @@ export default async function(req){
   if(req.method==='POST'){
    const b=await req.json(),d=String(b.data||''),t=String(b.tempo||''),m=t.match(/^(\d{1,2}):([0-5]\d):([0-5]\d)$/),segundos=m?Number(m[1])*3600+Number(m[2])*60+Number(m[3]):0,colocacao=Number(b.colocacao);
    if(!/^2026-\d{2}-\d{2}$/.test(d)||!Number.isFinite(Date.parse(d))||d>new Date().toISOString().slice(0,10)||!ds.includes(b.dist)||segundos<1||segundos>86400||!Number.isSafeInteger(colocacao)||colocacao<1||String(b.prova||'').trim().length<3||String(b.prova||'').length>120||String(b.localidade||'').trim().length>120||(!/^https:\/\//.test(String(b.url||''))&&!/^[a-f0-9-]{36}$/.test(String(b.comprovante_pdf||'')))||String(b.url||'').length>1000)return reply({erro:'Informe resultado oficial válido de 2026 e link HTTPS de comprovação'},400);
-   if(b.comprovante_pdf){const meta=await getStore({name:'comprovantes-resultados',consistency:'strong'}).getMetadata(String(b.comprovante_pdf));if(!meta||meta.metadata?.owner!==u.id)return reply({erro:'O PDF deve ser enviado pela sua própria conta'},403)} const rows=await db.sql`INSERT INTO resultados_beta_2026(atleta_id,prova,data,dist,tempo_segundos,colocacao,url,comprovante_pdf,localidade) SELECT id,${b.prova.trim()},${d}::date,${b.dist},${segundos},${colocacao},${b.url||''},${b.comprovante_pdf||null},${String(b.localidade||'').trim()||null} FROM atletas WHERE identity_id=${u.id} ON CONFLICT DO NOTHING RETURNING id`;
-   return rows.length?reply({id:rows[0].id,status:'pendente'},201):reply({erro:'Perfil online ausente ou resultado duplicado'},409);
+   if(b.comprovante_pdf){const meta=await getStore({name:'comprovantes-resultados',consistency:'strong'}).getMetadata(String(b.comprovante_pdf));if(!meta||meta.metadata?.owner!==u.id)return reply({erro:'O PDF deve ser enviado pela sua própria conta'},403)}
+   const perfil=await db.sql`SELECT id FROM atletas WHERE identity_id=${u.id} LIMIT 1`;
+   if(!perfil.length)return reply({erro:'Seu perfil online ainda não foi salvo. Acesse Perfil, preencha seus dados e salve antes de enviar o resultado.'},409);
+   const atletaId=perfil[0].id,prova=b.prova.trim(),localidade=String(b.localidade||'').trim()||null;
+   const anteriores=await db.sql`SELECT id,status FROM resultados_beta_2026 WHERE atleta_id=${atletaId} AND prova=${prova} AND data=${d}::date AND dist=${b.dist} LIMIT 1`;
+   if(anteriores.length){
+    if(anteriores[0].status!=='rejeitado')return reply({erro:anteriores[0].status==='pendente'?'Esta corrida já foi enviada e está aguardando homologação.':'Este resultado já está homologado. Para corrigir os dados, solicite revisão à administração.'},409);
+    const atualizados=await db.sql`UPDATE resultados_beta_2026 SET tempo_segundos=${segundos},colocacao=${colocacao},url=${b.url||''},comprovante_pdf=${b.comprovante_pdf||null},localidade=${localidade},status='pendente',criado_em=now() WHERE id=${anteriores[0].id} AND atleta_id=${atletaId} AND status='rejeitado' RETURNING id`;
+    return atualizados.length?reply({id:atualizados[0].id,status:'pendente',reenviado:true},200):reply({erro:'O resultado foi alterado. Atualize a página e tente novamente.'},409);
+   }
+   const rows=await db.sql`INSERT INTO resultados_beta_2026(atleta_id,prova,data,dist,tempo_segundos,colocacao,url,comprovante_pdf,localidade) VALUES(${atletaId},${prova},${d}::date,${b.dist},${segundos},${colocacao},${b.url||''},${b.comprovante_pdf||null},${localidade}) ON CONFLICT DO NOTHING RETURNING id`;
+   return rows.length?reply({id:rows[0].id,status:'pendente'},201):reply({erro:'Esta corrida já foi cadastrada. Atualize a página e confira seus resultados.'},409);
   }
   if(req.method==='PATCH'){
    if(!u.roles?.includes('admin'))return reply({erro:'Sem permissão'},403);
