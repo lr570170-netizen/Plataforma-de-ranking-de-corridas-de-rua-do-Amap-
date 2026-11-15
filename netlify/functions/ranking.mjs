@@ -5,7 +5,7 @@ export default async function(req){
  if(req.method!=='GET')return json({erro:'Método não permitido'},405);
  try{
   const db=getDatabase();
-  await db.sql`ALTER TABLE atletas ADD COLUMN IF NOT EXISTS nivel VARCHAR(12) NOT NULL DEFAULT 'Amador'`;const rows=await db.sql`SELECT a.id,a.nome,a.cidade,a.sexo,a.faixa,a.classe,a.nivel,r.id AS resultado_id,r.prova,r.data,r.dist,r.tempo_segundos,r.colocacao FROM resultados r JOIN atletas a ON a.id=r.atleta_id WHERE r.status='aprovado' AND r.data BETWEEN '2027-01-01' AND '2027-12-31' ORDER BY r.data,r.id`;
+  await db.sql`ALTER TABLE atletas ADD COLUMN IF NOT EXISTS nivel VARCHAR(12) NOT NULL DEFAULT 'Amador'`;const rows=await db.sql`SELECT a.id,a.nome,a.cidade,a.sexo,a.faixa,a.classe,a.nivel,r.id AS resultado_id,r.prova,r.data,r.dist,r.tempo_segundos,r.colocacao FROM resultados r JOIN atletas a ON a.id=r.atleta_id WHERE r.status='aprovado' AND r.dist IN ('5 km','6 km') AND r.data BETWEEN '2027-01-01' AND '2027-12-31' ORDER BY r.data,r.id`;
   const grupos=new Map(),referencias=new Map();
   for(const r of rows){
    const chave=[r.dist,r.sexo,r.classe||'',r.nivel||'Amador'].join('|'),atleta=String(r.id),prova=[r.prova,String(r.data).slice(0,10)].join('|');
