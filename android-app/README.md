@@ -13,3 +13,11 @@ Abra `android-app`, sincronize o Gradle com JDK 17 e Android SDK 35 e execute no
 ## Próximas etapas
 
 Validar login com Netlify Identity dentro do WebView, selecionar e enviar PDF/imagem, navegação e comportamento offline; melhorar ícone, splash screen e assinatura do aplicativo. A integração Health Connect/Strava requer consentimento, APIs específicas e trabalho adicional.
+
+## Preparação para Google Play Store
+
+Há um workflow manual `.github/workflows/android-play-release.yml` para gerar o Android App Bundle (`.aab`) de produção **somente após** configurar no GitHub Actions os segredos `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` e `ANDROID_KEY_PASSWORD`. A chave de assinatura deve ser criada e guardada de modo seguro pelo proprietário; nunca deve ser enviada por mensagem ou incluída no repositório. O workflow não publica automaticamente na Play Store.
+
+Antes de publicar, são necessários: conta Google Play Console verificada, nome e identidade visual próprios, capturas reais de tela, ícone 512×512, imagem de destaque, política de privacidade pública adequada ao tratamento de localização e dados de atletas, formulário Data safety, classificação indicativa, testes em aparelhos reais e eventuais exigências de teste fechado da conta. Não reutilize logotipo, nome ou interface protegida do Strava.
+
+**Funcionalidades de referência para futuras versões:** feed de atividades, mapa de percursos, metas, desafios, recordes pessoais, segmentos e sincronização autorizada com wearables. Nenhuma dessas funcionalidades deve ser anunciada como pronta sem implementação e testes. O GPS atual não sincroniza com o ranking online.
