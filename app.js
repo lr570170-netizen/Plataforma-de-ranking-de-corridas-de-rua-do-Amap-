@@ -273,7 +273,7 @@ async function treinoLerImagem(file){
  const texto=resultado.data.text||'';
  const distancia=texto.match(/(?:dist[aâ]ncia|distance|dist)\s*[:\-]?\s*(\d{1,3}(?:[.,]\d{1,2})?)\s*(km|quil[oô]metros?)/i)||texto.match(/(\d{1,3}(?:[.,]\d{1,2})?)\s*(km)\b/i);
  const tempo=texto.match(/(?:tempo|dura[cç][aã]o|moving time|elapsed time|time)\s*[:\\-]?\s*(\d{1,2}:\d{2}(?::\d{2})?)/i);
- const minutos=texto.match(/(?:dura[cç][aã]o|tempo|moving time|elapsed time)\s*[:\\-]?\s*(\d{1,3})\s*(?:min(?:utos?|s)?|mins?)(?:\s*(\d{1,2})\s*(?:s|seg(?:undos?)?))?/i);
+ const minutos=texto.match(/(?:dura[cç][aã]o|tempo|moving time|elapsed time)\s*[:\\-]?\s*(\d{1,3})\s*(?:min[a-záéíóúãõç]*)(?:\s*(\d{1,2})\s*(?:s|seg(?:undos?)?))?/i);
  const horas=texto.match(/(?:dura[cç][aã]o|tempo|moving time|elapsed time)\s*[:\\-]?\s*(\d{1,2})\s*(?:h|horas?)\s*(\d{1,2})?\s*(?:min(?:utos?)?)?/i);
  const d=distancia?Number(distancia[1].replace(',','.')):null;
  const segundos=tempo?tempo[1].split(':').map(Number).reduce((a,b)=>a*60+b,0):horas?Number(horas[1])*3600+Number(horas[2]||0)*60:minutos?Number(minutos[1])*60+Number(minutos[2]||0):null;
