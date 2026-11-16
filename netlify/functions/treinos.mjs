@@ -17,7 +17,7 @@ export default async function(req){try{const db=getDatabase();await init(db);if(
  const u=await getUser();if(!u)return reply({erro:'Faça login.'},401);
  const d=Number(raw.distancia_m),t=Number(raw.duracao_s),inicio=Date.parse(raw.iniciado_em||''),hash=String(raw.arquivo_hash||'');
  if(!Number.isSafeInteger(d)||d<100||d>100000||!Number.isSafeInteger(t)||t<30||t>86400||d/t>7.5||!Number.isFinite(inicio)||inicio>Date.now()+60000||inicio<Date.now()-31536000000||!/^[a-f0-9]{64}$/.test(hash))return reply({erro:'Comprovante com dados insuficientes ou incoerentes.'},400);
- const perfil=await db.sql`SELECT nome,cidade,sexo FROM atletas WHERE identity_id=${u.id} LIMIT 1`;if(!perfil.length)return reply({erro:'Complete seu perfil.'},409);
+ if(!inicioPermitido(inicio))return erroData();const perfil=await db.sql`SELECT nome,cidade,sexo FROM atletas WHERE identity_id=${u.id} LIMIT 1`;if(!perfil.length)return reply({erro:'Complete seu perfil.'},409);
  await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS arquivo_hash TEXT`;await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS removido_em TIMESTAMPTZ`;
  const dup=await db.sql`SELECT id FROM treinos_gps WHERE identity_id=${u.id} AND removido_em IS NULL AND (arquivo_hash=${hash} OR (iniciado_em=${new Date(inicio).toISOString()}::timestamptz AND ABS(distancia_m-${d})<50)) LIMIT 1`;if(dup.length)return reply({erro:'Atividade duplicada.'},409);
  const a=perfil[0];const r=await db.sql`INSERT INTO treinos_gps(identity_id,nome,cidade,sexo,distancia_m,duracao_s,iniciado_em,arquivo_hash) VALUES(${u.id},${a.nome},${a.cidade},${a.sexo},${d},${t},${new Date(inicio).toISOString()}::timestamptz,${hash}) RETURNING id`;
