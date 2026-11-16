@@ -272,12 +272,19 @@ async function treinoLerImagem(file){
  const resultado=await window.Tesseract.recognize(file,'por+eng');
  const texto=resultado.data.text||'';
  const distancia=texto.match(/(?:dist[aâ]ncia|distance|dist)\s*[:\-]?\s*(\d{1,3}(?:[.,]\d{1,2})?)\s*(km|quil[oô]metros?)/i)||texto.match(/(\d{1,3}(?:[.,]\d{1,2})?)\s*(km)\b/i);
- const tempo=texto.match(/(?:tempo|dura[cç][aã]o|moving time|elapsed time|time)\s*[:\-]?\s*(\d{1,2}:\d{2}(?::\d{2})?)/i);
+ const tempo=texto.match(/(?:tempo|dura[cç][aã]o|moving time|elapsed time|time)\s*[:\\-]?\s*(\d{1,2}:\d{2}(?::\d{2})?)/i);
+ const minutos=texto.match(/(?:dura[cç][aã]o|tempo|moving time|elapsed time)\s*[:\\-]?\s*(\d{1,3})\s*(?:min(?:utos?|s)?|mins?)(?:\s*(\d{1,2})\s*(?:s|seg(?:undos?)?))?/i);
+ const horas=texto.match(/(?:dura[cç][aã]o|tempo|moving time|elapsed time)\s*[:\\-]?\s*(\d{1,2})\s*(?:h|horas?)\s*(\d{1,2})?\s*(?:min(?:utos?)?)?/i);
  const d=distancia?Number(distancia[1].replace(',','.')):null;
- const segundos=tempo?tempo[1].split(':').map(Number).reduce((a,b)=>a*60+b,0):null;
- const data=texto.match(/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})\b/);
- const inicio=data?new Date(Number(data[3]),Number(data[2])-1,Number(data[1]),12,0,0):null;
- return {texto:texto.slice(0,3500),distancia:Number.isFinite(d)?d:null,tempo:segundos,inicio:inicio&&inicio.getFullYear()===Number(data[3])&&inicio.getMonth()===Number(data[2])-1&&inicio.getDate()===Number(data[1])?inicio.toISOString():null};
+ const segundos=tempo?tempo[1].split(':').map(Number).reduce((a,b)=>a*60+b,0):horas?Number(horas[1])*3600+Number(horas[2]||0)*60:minutos?Number(minutos[1])*60+Number(minutos[2]||0):null;
+ const data=texto.match(/\b(\d{1,2})[\/.\\-](\d{1,2})[\/.\\-](20\d{2})\b/);
+ const meses={jan:0,fev:1,mar:2,abr:3,mai:4,jun:5,jul:6,ago:7,set:8,out:9,nov:10,dez:11};
+ const porExtenso=texto.match(/\b(\d{1,2})\s+de\s+(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)[a-zç.]*(?:\s+de\s+(20\d{2}))?/i);
+ let inicio=null;
+ if(data)inicio=new Date(Number(data[3]),Number(data[2])-1,Number(data[1]),12,0,0);
+ else if(porExtenso){const dia=Number(porExtenso[1]),mes=meses[porExtenso[2].toLowerCase()],agora=new Date();let ano=porExtenso[3]?Number(porExtenso[3]):agora.getFullYear();inicio=new Date(ano,mes,dia,12,0,0);if(!porExtenso[3]&&inicio.getTime()>Date.now()+86400000)inicio=new Date(ano-1,mes,dia,12,0,0)}
+ const valido=inicio&&inicio.getTime()<=Date.now()+60000&&inicio.getTime()>=Date.now()-31536000000;
+ return {texto:texto.slice(0,3500),distancia:Number.isFinite(d)?d:null,tempo:segundos,inicio:valido?inicio.toISOString():null};
 }
 let treinoArquivoSelecionado=null;
 function treinoSelecionarArquivo(input){
@@ -306,7 +313,7 @@ async function treinoImportarArquivo(input){
    treinoImportacaoStatus('Conferindo percurso e dados no servidor...');
    const r=await onlineRequest('/api/treinos','POST',{importacao:true,tipo:ext,conteudo:await file.text()});
    treinoImportacaoStatus('Treino aprovado na conferência automática: '+(r.distancia_m/1000).toFixed(2).replace('.',',')+' km em '+treinoDuracao(r.duracao_s)+'. Classificado no ranking de treinos.');
-   await treinoCarregar();return;
+   await treinoCarregar();treinoImportacaoStatus('Treino registrado e ranking atualizado com sucesso.');return;
   }
   let resumo='';let distancia=null;let tempo=null;
   if(ext==='gpx'||ext==='tcx'){
