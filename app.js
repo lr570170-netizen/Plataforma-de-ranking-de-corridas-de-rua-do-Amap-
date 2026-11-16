@@ -275,8 +275,10 @@ async function treinoLerImagem(file){
  const tempo=texto.match(/(?:tempo|dura[cç][aã]o|moving time|elapsed time|time)\s*[:\\-]?\s*(\d{1,2}:\d{2}(?::\d{2})?)/i);
  const minutos=texto.match(/(?:dura[cç][aã]o|tempo|moving time|elapsed time)\s*[:\\-]?\s*(\d{1,3})\s*(?:min[a-záéíóúãõç]*)(?:\s*(\d{1,2})\s*(?:s|seg(?:undos?)?))?/i);
  const horas=texto.match(/(?:dura[cç][aã]o|tempo|moving time|elapsed time)\s*[:\\-]?\s*(\d{1,2})\s*(?:h|horas?)\s*(\d{1,2})?\s*(?:min(?:utos?)?)?/i);
+ const duracaoSolta=texto.match(/\b(\d{1,2})\s*h\s*(\d{1,2})\s*min(?:[a-záéíóúãõç]*)?\s*(\d{1,2})?\s*s?\b/i)||texto.match(/\b(\d{1,3})\s*min(?:[a-záéíóúãõç]*)?\s*(\d{1,2})?\s*(?:s|seg(?:undos?)?)?\b/i);
+ const segundosSoltos=duracaoSolta?(duracaoSolta[0].toLowerCase().includes('h')?Number(duracaoSolta[1])*3600+Number(duracaoSolta[2])*60+Number(duracaoSolta[3]||0):Number(duracaoSolta[1])*60+Number(duracaoSolta[2]||0)):null;
  const d=distancia?Number(distancia[1].replace(',','.')):null;
- const segundos=tempo?tempo[1].split(':').map(Number).reduce((a,b)=>a*60+b,0):horas?Number(horas[1])*3600+Number(horas[2]||0)*60:minutos?Number(minutos[1])*60+Number(minutos[2]||0):null;
+ const segundos=tempo?tempo[1].split(':').map(Number).reduce((a,b)=>a*60+b,0):horas?Number(horas[1])*3600+Number(horas[2]||0)*60:minutos?Number(minutos[1])*60+Number(minutos[2]||0):segundosSoltos;
  const data=texto.match(/\b(\d{1,2})[\/.\\-](\d{1,2})[\/.\\-](20\d{2})\b/);
  const meses={jan:0,fev:1,mar:2,abr:3,mai:4,jun:5,jul:6,ago:7,set:8,out:9,nov:10,dez:11};
  const porExtenso=texto.match(/\b(\d{1,2})\s+de\s+(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)[a-zç.]*(?:\s+de\s+(20\d{2}))?/i);
