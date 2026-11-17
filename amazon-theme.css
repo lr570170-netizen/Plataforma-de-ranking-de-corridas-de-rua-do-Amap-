@@ -1,0 +1,37 @@
+/* Ranking Amapá Running — identidade amazônica 2027.
+   Camada visual isolada: não modifica lógica, dados ou APIs. */
+:root{--dark:#123b2a;--dark2:#1b5138;--mint:#d4a83f;--border:#e4e8dc;--focus:#eac766;--amazon-green:#104b35;--amazon-gold:#d4a83f;--amazon-cream:#f5f1e6}
+body{background:radial-gradient(ellipse at 90% 0%,#e5eddf 0%,transparent 46%),var(--amazon-cream);color:#203a2d}
+header{background:linear-gradient(115deg,#0c3527,#17563b);box-shadow:0 8px 30px #102f2326}
+.brand small,.season-label,.greeting-mark{color:#e7c66d}
+nav button.active{background:#d4a83f22;color:#f4d47d;border-color:#d4a83f55}
+nav button:hover,nav a.reg-nav:hover{color:#f4d47d}
+.logo{border:1px solid #d4a83f66}
+.hero,.hero.running-hero{background:radial-gradient(circle at 83% 18%,#3c8053aa,transparent 38%),linear-gradient(120deg,#0b3328,#16543b 75%,#256744);box-shadow:0 20px 45px #0b392a26}
+.hero:after,.hero:before{border-color:#d4a83f24}
+.eyebrow,.running-hero .eyebrow,.track-caption{color:#f1ce72}
+.track-graphic{border-color:#d4a83f;box-shadow:0 0 0 16px #d4a83f22,inset 0 0 0 2px #ffffff55}
+.track-line{background:#d4a83f}
+.btn,#pwa-install-button{background:#d4a83f;color:#183628}
+.btn.secondary{background:#e7eddd;color:#23523a}
+.btn.dark{background:#145039;color:white}
+.btn:hover{box-shadow:0 8px 22px #a9843038}
+.section h2,.app-greeting h2{color:#153d2c}
+.card,.panel{background:#fffefb;border-color:#e4e8dc;box-shadow:0 9px 30px #254a3010}
+.sport-cards .card{background:linear-gradient(145deg,#fffefb,#f7f6ed)}
+.card:before,.sport-cards .card:before{background:linear-gradient(90deg,#1c6847,#d4a83f)}
+.card:hover{border-color:#d4a83f}
+.card .emoji,.sport-cards .card .emoji{background:#f5efda}
+.stat{color:#1d6a45}
+.tag,.pill{background:#f7edcd;color:#76591b}
+.place.top{background:#f5e4b1;color:#745317}
+.progress>span{background:linear-gradient(90deg,#287e53,#d4a83f)}
+input:focus,select:focus,textarea:focus{border-color:#b88d2b}
+a{color:#1a704b}
+thead th{background:#f6f5ec}
+tbody tr:hover{background:#f8f5e9}
+footer{background:#e8eadf;color:#4b6553}
+#pwa-install{background:#123b2a;border-color:#d4a83f}
+::selection{background:#d4a83f;color:#123b2a}
+@media(max-width:600px){.hero.running-hero{padding:28px 20px}.brand small{letter-spacing:1px}nav button.active{box-shadow:inset 0 -2px #d4a83f}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
