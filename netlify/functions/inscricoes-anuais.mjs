@@ -9,6 +9,13 @@ export default async function(req){
   const admin=isAdmin(user),db=getDatabase();
   await db.sql`CREATE TABLE IF NOT EXISTS inscricoes_anuais (id BIGSERIAL PRIMARY KEY, usuario_id TEXT NOT NULL, email TEXT NOT NULL, temporada INTEGER NOT NULL, valor_centavos INTEGER NOT NULL, comprovante_base64 TEXT NOT NULL, comprovante_tipo TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pendente', criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), analisado_em TIMESTAMPTZ, analisado_por TEXT, UNIQUE(usuario_id,temporada))`;
   if(req.method==='GET'){
+   const proofId=Number(new URL(req.url).searchParams.get('comprovante_id'));
+   if(Number.isSafeInteger(proofId)&&proofId>0){
+    if(!admin)return reply({erro:'Acesso restrito.'},403);
+    const proof=await db.sql`SELECT comprovante_base64,comprovante_tipo FROM inscricoes_anuais WHERE id=${proofId} LIMIT 1`;
+    if(!proof.length)return reply({erro:'Comprovante não encontrado.'},404);
+    return reply({comprovante:'data:'+proof[0].comprovante_tipo+';base64,'+proof[0].comprovante_base64});
+   }
    if(new URL(req.url).searchParams.get('admin')==='1'){
     if(!admin)return reply({erro:'Acesso restrito à administração.'},403);
     const rows=await db.sql`SELECT id,usuario_id,email,temporada,valor_centavos,status,criado_em,analisado_em FROM inscricoes_anuais WHERE temporada=2027 ORDER BY CASE WHEN status='pendente' THEN 0 ELSE 1 END,criado_em DESC LIMIT 250`;
