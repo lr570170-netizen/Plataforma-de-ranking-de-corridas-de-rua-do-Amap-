@@ -10,14 +10,14 @@ export default async function(req){
   await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS removido_em TIMESTAMPTZ`;
   await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS removido_por TEXT`;
   await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS motivo_remocao TEXT`;await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS origem TEXT`;await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS homologado_em TIMESTAMPTZ`;await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS homologado_por TEXT`;
-  if(req.method==='GET'){
-   const rows=await db.sql`SELECT id,nome,cidade,sexo,distancia_m,duracao_s,iniciado_em,criado_em,removido_em,motivo_remocao,origem,homologado_em,ROUND((distancia_m::numeric/1000)*10+(distancia_m::numeric*3600/NULLIF(duracao_s,0)/1000)*5,2) AS pontos FROM treinos_gps ORDER BY criado_em DESC LIMIT 300`;
+  await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS nome_corrida TEXT`;await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS resultado_oficial TEXT`;if(req.method==='GET'){
+   const rows=await db.sql`SELECT id,nome,cidade,sexo,distancia_m,duracao_s,iniciado_em,criado_em,removido_em,motivo_remocao,origem,homologado_em,nome_corrida,resultado_oficial,ROUND((distancia_m::numeric/1000)*10+(distancia_m::numeric*3600/NULLIF(duracao_s,0)/1000)*5,2) AS pontos FROM treinos_gps ORDER BY criado_em DESC LIMIT 300`;
    return reply({treinos:rows});
   }
   if(req.method==='PATCH'){
    const b=await req.json(),id=Number(b.id);
    if(!Number.isSafeInteger(id)||id<1)return reply({erro:'ID inválido.'},400);
-   const rows=await db.sql`UPDATE treinos_gps SET homologado_em=NOW(),homologado_por=${user.id} WHERE id=${id} AND origem='autodeclarado' AND homologado_em IS NULL AND removido_em IS NULL RETURNING id`;
+   const rows=await db.sql`UPDATE treinos_gps SET homologado_em=NOW(),homologado_por=${user.id} WHERE id=${id} AND origem='corrida_oficial' AND nome_corrida IS NOT NULL AND resultado_oficial IS NOT NULL AND homologado_em IS NULL AND removido_em IS NULL RETURNING id`;
    if(!rows.length)return reply({erro:'Treino não encontrado, removido ou já homologado.'},409);
    return reply({ok:true,id:rows[0].id,mensagem:'Treino homologado e pontuação liberada no ranking.'});
   }
