@@ -9,7 +9,7 @@ export default async function(req){
   const db=getDatabase();
   await db.sql`CREATE TABLE IF NOT EXISTS treinos_gps (id BIGSERIAL PRIMARY KEY, identity_id TEXT NOT NULL, nome TEXT NOT NULL, cidade TEXT NOT NULL, sexo TEXT NOT NULL, distancia_m INTEGER NOT NULL, duracao_s INTEGER NOT NULL, iniciado_em TIMESTAMPTZ NOT NULL, criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW())`;
   await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS removido_em TIMESTAMPTZ`;await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS origem TEXT`;await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS homologado_em TIMESTAMPTZ`;await db.sql`ALTER TABLE treinos_gps ADD COLUMN IF NOT EXISTS nome_corrida TEXT`;
-  const rows=await db.sql`SELECT id,distancia_m,duracao_s,iniciado_em,nome_corrida,origem,homologado_em,ROUND(100000.0/NULLIF(duracao_s,0),2) AS pontos FROM treinos_gps WHERE identity_id=${user.id} AND removido_em IS NULL AND origem='corrida_oficial' AND homologado_em IS NOT NULL AND distancia_m BETWEEN 4900 AND 5100 AND duracao_s>0 ORDER BY iniciado_em DESC LIMIT 2000`;
+  const rows=await db.sql`SELECT id,distancia_m,duracao_s,iniciado_em,nome_corrida,origem,homologado_em,ROUND(100000.0/NULLIF(duracao_s,0),2) AS pontos FROM treinos_gps WHERE identity_id=${user.id} AND removido_em IS NULL AND origem='corrida_oficial' AND distancia_m BETWEEN 4900 AND 5100 AND duracao_s>0 ORDER BY iniciado_em DESC LIMIT 2000`;
   return reply({treinos:rows});
  }catch(e){console.error('perfil estatisticas:',e);return reply({erro:'Não foi possível consultar os treinos.'},503)}
 }
